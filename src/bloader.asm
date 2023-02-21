@@ -1,17 +1,21 @@
-[org 0x7c00]
+ORG 0
 BITS 16
 
 _start:
-    mov [BOOT_DISK], dl
+    cli                     ;Clear interrupts 
     ;Load segmented registers
-    mov ax, 0
+    mov ax, 0x7c0
     mov es, ax
     mov ds, ax
+    mov ax, 0x00
+    mov ss, ax
     mov bp, 0x1200          ;Stack base pointer
-    mov sp, bp
+    mov sp, bp              ;Empty stack
+    sti                     ;Enable interrupts
 
     ;Read other sectors
-    mov bx, 0x7e00          ;Start adress
+    mov [BOOT_DISK], dl
+    mov bx, 0x200          ;Start adress
     mov ah, 2               
     mov al, 2               ;number of sectors
     mov ch, 0               ;Cylinder number
@@ -22,18 +26,26 @@ _start:
 
 _main:
     mov si, _title
+
+    push si
     call _print_loop
+    pop si
     call _keyboard_wait
+
+
     mov si, _markito
+
+    push si
     call _print_loop
+    pop si
+
     jmp _end
 
 _print_loop:
     mov ah, 0x0e            ;teletype mode
-    mov al, [si]
+    lodsb                   ;al <- [ds:si], si++
     int 0x10                ;call BIOS interrupt 0x10 for print
-    inc si                  ;next character
-    test al,al              ;test if NULL character
+    test al,al              ;[si] == 0?
     jne _print_loop
     ret
 
@@ -46,6 +58,7 @@ _end:
     jmp $                   ;infinite loop 
 BOOT_DISK: db 0
 times 510-($-$$) db 0       ;fill remaining spaces with 0
+
 db 0x55, 0xaa               ;Boot signature
 
 _title:
