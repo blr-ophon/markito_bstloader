@@ -2,8 +2,14 @@ ORG 0
 BITS 16
 
 _start:
-    cli                     ;Clear interrupts 
+    jmp short _setup
+    nop
+    times 33 db 0           ;Clear BPB (BIOS Parameter Block)
+    jmp 0x7c0:_setup        ;cs <- 0x7c0
+
+_setup:
     ;Load segmented registers
+    cli                     ;Clear interrupts 
     mov ax, 0x7c0
     mov es, ax
     mov ds, ax
@@ -61,6 +67,9 @@ times 510-($-$$) db 0       ;fill remaining spaces with 0
 
 db 0x55, 0xaa               ;Boot signature
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   0x200 (512 bytes from previous code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 _title:
     db "***** BLR-OPHON BOSTALOADER VERSION 1.0 *****", 0x0a, 0x0d, 0
 _markito:
