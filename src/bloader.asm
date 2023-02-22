@@ -20,15 +20,13 @@ _setup:
     sti                     ;Enable interrupts
 
     ;Read other sectors
-    mov [BOOT_DISK], dl
-    mov bx, 0x200          ;Start adress
-    mov ah, 2               
+    mov ah, 2               ;INT 13/AH = 0x: Read sector into memory
+    mov bx, 0x200           ;Start adress
     mov al, 2               ;number of sectors
     mov ch, 0               ;Cylinder number
     mov cl, 2               ;Sector number
     mov dh, 0               ;Head number
-    mov dl, [BOOT_DISK]
-    int 0x13                ;Read sectors 
+    int 0x13                ;Read sector 
 
 _main:
     mov si, _title
@@ -44,25 +42,25 @@ _main:
     push si
     call _print_loop
     pop si
+    jmp _main               ;repeat
 
     jmp _end
 
 _print_loop:
-    mov ah, 0x0e            ;teletype mode
+    mov ah, 0x0e            ;INT 10/AH = 0x0: tty mode
     lodsb                   ;al <- [ds:si], si++
-    int 0x10                ;call BIOS interrupt 0x10 for print
+    int 0x10                ;Print to tty
     test al,al              ;[si] == 0?
     jne _print_loop
     ret
 
 _keyboard_wait:
-    mov ah, 0
-    int 0x16
+    mov ah, 0               ;INT 16/AH = 0x0: Get keystroke
+    int 0x16                ;Get keystroke
     ret
 
 _end:
     jmp $                   ;infinite loop 
-BOOT_DISK: db 0
 times 510-($-$$) db 0       ;fill remaining spaces with 0
 
 db 0x55, 0xaa               ;Boot signature
