@@ -4,23 +4,24 @@ FLAGS := -g -f bin
 SRC_DIR := ./src
 BIN_DIR := ./bin
 
-BLOADER := ${BIN_DIR}/bloader.bin
+BOOT_SRC := ${SRC_DIR}/boot/boot.asm
+BOOT_BIN := ${BIN_DIR}/boot/boot.bin
 
-bootloader: ${BLOADER} 
+bootloader: ${BOOT_BIN} 
 
-${BIN_DIR}/%.bin: ${SRC_DIR}/%.asm
+${BOOT_BIN}: ${BOOT_SRC}
 	mkdir -p $(dir $@)
 	${ASM} ${FLAGS} $< -o $@
 
-run: ${BLOADER}
-	qemu-system-x86_64 $< 
-
-debug: ${BLOADER}
+bootloader-debug: ${BOOT}
 	cgdb -x ./debug/qemugdbinit 
 
-dump: ${BLOADER}
+bootloader-dump: ${BOOT}
 	objdump -D -Mintel,i8086 -b binary -m i386 $<
 
+run: ${BOOT_BIN}
+	qemu-system-x86_64 $< 
+
 clean: 
-	rm -rf ${BLOADER}
+	rm -rf ${BIN_DIR}/*
 

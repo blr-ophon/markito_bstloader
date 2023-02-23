@@ -57,12 +57,12 @@ _switch_to_protected:
     mov cr0, eax
     ; Perform far jump to selector 08h (offset into GDT, pointing at a 32bit PM code segment descriptor) 
     ; to load CS with proper PM32 descriptor)
-    jmp CODE_SEG:load32
+    ;jmp CODE_SEG:load32
+    jmp _end
 
 _end:
     jmp $
 
-    jmp _end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                           REAL-MODE SUBROUTINES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -129,43 +129,8 @@ gdt_start:                  ;0ffset + 0
         dw gdt_descriptor - gdt_start - 1   ;size
         dd gdt_start                        ;offset
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                       PROTECTED MODE CODE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[BITS 32]
-load32:
-    ;set segmented registers
-    mov ax, DATA_SEG
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
-    
-    ;set stack
-    mov ebp, 0x00200000
-    mov esp, ebp
-
-    mov esi, title
-    mov edi, 0xb8000
-    call print_loop_32
-    jmp $
-
 times 510-($-$$) db 0       ;fill remaining spaces with 0
 db 0x55, 0xaa               ;Boot signature
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                       PROTECTED-MODE SUBROUTINES
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-print_loop_32:
-    mov ah, 0x0f            
-    lodsb                   ;al <- [ds:si], si++
-    mov [edi], ax
-    inc edi
-    test al,al              ;[si] == 0?
-    jne print_loop_32
-    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                       0x200 offset sector
