@@ -1,5 +1,12 @@
 ORG 0x7c00
-BITS 16
+[BITS 16]
+;Offsets for code and data GDTs
+CODE_SEG equ code_descriptor - gdt_start       
+DATA_SEG equ data_descriptor - gdt_start
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                           REAL-MODE CODE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _start:
     jmp short _setup
@@ -28,7 +35,7 @@ _setup:
     int 0x13                ;Read sector 
     jc read_s_error
 
-start_title:
+start_title:                ;Print title to test real mode
     mov si, title
 
     push si
@@ -42,12 +49,22 @@ start_title:
     call print_loop
     pop si
 
+_switch_to_protected:
+    cli                     ;Clear interrupts
+    lgdt [gdt_descriptor]   ;load gdt descriptor
+    mov eax, cr0            ;Set bit 0  of cr0
+    or eax, 0x1
+    mov cr0, eax
+    ; Perform far jump to selector 08h (offset into GDT, pointing at a 32bit PM code segment descriptor) 
+    ; to load CS with proper PM32 descriptor)
+    jmp CODE_SEG:load32
+
 _end:
     jmp $
 
     jmp _end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                               SUBROUTINES
+;                           REAL-MODE SUBROUTINES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 print_loop:
@@ -76,45 +93,79 @@ _read_s_error_m:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;Pointed to by value in gdtr register
 gdt_start:                  ;0ffset + 0
-    dd 0x00000000           
-    dd 0x00000000          
+    null_descriptor:
+        dd 0x00000000           
+        dd 0x00000000          
 
-gdt_code:                   ;Offset + 8 ;CS
-    ;Limit: 0xfffff, 4gb of addressable unit
-    ;Base: 0x00000000, Segment begins at 0x0000
-    ;Access Byte: |valid segment | ring 0 | code/data type | executable |
-    ;             | executed only from ring 0 | readable | 0 (CPU will handle) |
-    ;Flags: | Limit in 4kiB blocks | 32-bit protected segment | non 64-bit segment |
-    dw 0xffff               ;Limit_1
-    dw 0x0000               ;Base_1 
-    db 0x00                 ;Base_2 
-    db 0x9a                 ;Access Byte
-    db 11001111b            ;Limit_2(1111) and Flags(1100)
-    db 0x00                 ;Base3
+    code_descriptor:        ;Offset + 8 ;CS
+        dw 0xffff           ;Limit_1
+        dw 0x0000           ;Base_1 
+        db 0x00             ;Base_2 
+        db 0x9a             ;Access Byte
+        db 11001111b        ;Limit_2(1111) and Flags(1100)
+        db 0x00             ;Base3
 
-gdt_data:                   ;Offset + 16 ;DS, SS, ES, FS, GS
-    ;Limit: 0xfffff, 4gb of addressable unit
-    ;Base: 0x00000000, Segment begins at 0x0000
-    ;Access Byte: |valid segment | ring 0 | code/data type | non-executable |
-    ;             | segment grows UP | writable | 0 (CPU will handle) |
-    ;Flags: | Limit in 4kiB blocks | 32-bit protected segment | non 64-bit segment |
-    dw 0xffff               ;Limit_1
-    dw 0x0000               ;Base_1
-    db 0x00                 ;Base_2 
-    db 0x92                 ;Access Byte
-    db 11001111b            ;Limit_2(1111) and Flags(1100)
-    db 0x00                 ;Base_3
+        ;Limit: 0xfffff, 4gb of addressable unit
+        ;Base: 0x00000000, Segment begins at 0x0000
+        ;Access Byte: |valid segment | ring 0 | code/data type | executable |
+        ;             | executed only from ring 0 | readable | 0 (CPU will handle) |
+        ;Flags: | Limit in 4kiB blocks | 32-bit protected segment | non 64-bit segment |
 
-gdt_end:                    ;Offset + 24
+    data_descriptor:        ;Offset + 16 ;DS, SS, ES, FS, GS
+        dw 0xffff           ;Limit_1
+        dw 0x0000           ;Base_1
+        db 0x00             ;Base_2 
+        db 0x92             ;Access Byte
+        db 11001111b        ;Limit_2(1111) and Flags(1100)
+        db 0x00             ;Base_3
 
-gdt_descriptor:             
-    dw gdt_end - gdt_start - 1  ;size
-    dd gdt_start                ;offset
+        ;Limit: 0xfffff, 4gb of addressable unit
+        ;Base: 0x00000000, Segment begins at 0x0000
+        ;Access Byte: |valid segment | ring 0 | code/data type | non-executable |
+        ;             | segment grows UP | writable | 0 (CPU will handle) |
+        ;Flags: | Limit in 4kiB blocks | 32-bit protected segment | non 64-bit segment |
+
+    gdt_descriptor:                         ;Offset + 24
+        dw gdt_descriptor - gdt_start - 1   ;size
+        dd gdt_start                        ;offset
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                       PROTECTED MODE CODE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[BITS 32]
+load32:
+    ;set segmented registers
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    
+    ;set stack
+    mov ebp, 0x00200000
+    mov esp, ebp
+
+    mov esi, title
+    mov edi, 0xb8000
+    call print_loop_32
+    jmp $
 
 times 510-($-$$) db 0       ;fill remaining spaces with 0
 db 0x55, 0xaa               ;Boot signature
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                       PROTECTED-MODE SUBROUTINES
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+print_loop_32:
+    mov ah, 0x0f            
+    lodsb                   ;al <- [ds:si], si++
+    mov [edi], ax
+    inc edi
+    test al,al              ;[si] == 0?
+    jne print_loop_32
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                       0x200 offset sector

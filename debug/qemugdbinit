@@ -1,0 +1,1 @@
+target remote | qemu-system-x86_64 -hda ./bin/bloader.bin -S -gdb stdio

@@ -1,5 +1,5 @@
 ASM := nasm 
-FLAGS := -f bin
+FLAGS := -g -f bin
 
 SRC_DIR := ./src
 BIN_DIR := ./bin
@@ -13,7 +13,10 @@ ${BIN_DIR}/%.bin: ${SRC_DIR}/%.asm
 	${ASM} ${FLAGS} $< -o $@
 
 run: ${BLOADER}
-	qemu-system-x86_64 $<
+	qemu-system-x86_64 $< 
+
+debug: ${BLOADER}
+	cgdb -x ./debug/qemugdbinit 
 
 dump: ${BLOADER}
 	objdump -D -Mintel,i8086 -b binary -m i386 $<
