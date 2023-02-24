@@ -22,15 +22,19 @@ KERNEL_BIN := ${BIN_DIR}/kernel.bin
 
 
 
-all: ${OS_BIN} ${KERNEL_BIN}
+all: ${OS_BIN} 
 
 ${BOOT_BIN}: ${BOOT_SRC}
 	mkdir -p $(dir $@)
 	${ASM} ${ASMFLAGS} -f bin $< -o $@
 
-${OS_BIN}: ${BOOT_BIN} 
+${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 	rm -rf {OS_BIN}
 	dd if=${BOOT_BIN} >> ${OS_BIN}
+	dd if=${KERNEL_BIN} >> ${OS_BIN}
+	#100 sectors of 512 bytes of zeroes
+	dd if=/dev/zero bs=512 count=100 >> ${OS_BIN} 
+
 
 ${KERNEL_BIN}: ${KERNEL_ASM_O} ${KERNEL_O}
 	i686-elf-ld -g -relocatable $^ -o ${KERNEL_MERGED}
@@ -49,8 +53,11 @@ ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 debug: ${KERNEL_BIN}
 	cgdb -x ./debug/qemugdbinit 
 
-dump: ${KERNEL_BIN}
+dump-boot: ${BOOT_BIN}
 	objdump -D -Mintel,i8086 -b binary -m i386 $<
+
+dump: ${KERNEL_BIN}
+	objdump -D -b binary -m i386 $<
 
 run: ${BOOT_BIN}
 	qemu-system-x86_64 $< 

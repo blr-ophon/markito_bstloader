@@ -1,4 +1,4 @@
-ENTRY(_start_)
+ENTRY(_start)
 OUTPUT_FORMAT(binary)
 SECTIONS
 {

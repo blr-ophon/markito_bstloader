@@ -1,9 +1,10 @@
 [BITS 32]
+global _start
 
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
 
-load32:
+_start:
     ;set segmented registers
     mov ax, DATA_SEG
     mov ds, ax
@@ -20,4 +21,6 @@ load32:
     in al, 0x92
     or al, 2
     out 0x92, al
+
+    jmp $
 
