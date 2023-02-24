@@ -1,1 +1,2 @@
-target remote | qemu-system-x86_64 -hda ./bin/bloader.bin -S -gdb stdio
+add-symbol-file ./build/kernel_merged.o 0x100000
+target remote | qemu-system-x86_64 -hda ./bin/os.bin -S -gdb stdio

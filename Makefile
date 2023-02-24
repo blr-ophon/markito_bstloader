@@ -50,7 +50,7 @@ ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 	${ASM} ${ASMFLAGS} -f elf $< -o $@
 
 
-debug: ${KERNEL_BIN}
+debugger: ${KERNEL_MERGED}
 	cgdb -x ./debug/qemugdbinit 
 
 dump-boot: ${BOOT_BIN}

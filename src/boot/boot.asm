@@ -26,30 +26,24 @@ _setup:
     sti                     ;Enable interrupts
 
     ;Read other sectors
-    mov ah, 2               ;INT 13/AH = 0x: Read sector into memory
-    mov bx, 0x7e00           ;Start adress
-    mov al, 2               ;number of sectors
-    mov ch, 0               ;Cylinder number
-    mov cl, 2               ;Sector number
-    mov dh, 0               ;Head number
-    int 0x13                ;Read sector 
-    jc read_s_error
+   ; mov ah, 2               ;INT 13/AH = 0x: Read sector into memory
+   ; mov bx, 0x7e00           ;Start adress
+   ; mov al, 2               ;number of sectors
+   ; mov ch, 0               ;Cylinder number
+   ; mov cl, 2               ;Sector number
+   ; mov dh, 0               ;Head number
+   ; int 0x13                ;Read sector 
+   ; jc read_s_error
 
 start_title:                ;Print title to test real mode
     mov si, title
-
-    push si
     call print_loop
-    pop si
-    call keyboard_wait
-
-    mov si, markito
-
-    push si
+    mov si, rm_start_m
     call print_loop
-    pop si
 
 _switch_to_protected:
+    mov si, pm_start_m
+    call print_loop
     cli                     ;Clear interrupts
     lgdt [gdt_descriptor]   ;load gdt descriptor
     mov eax, cr0            ;Set bit 0  of cr0
@@ -57,7 +51,9 @@ _switch_to_protected:
     mov cr0, eax
     ; Perform far jump to selector 08h (offset into GDT, pointing at a 32bit PM code segment descriptor) 
     ; to load CS with proper PM32 descriptor)
-    ;jmp CODE_SEG:load32
+    jmp CODE_SEG:_start32
+
+    
     jmp _end
 
 _end:
@@ -86,7 +82,7 @@ read_s_error:
     jmp _end
     
 _read_s_error_m:
-    db "Error reading sector"
+    db "**Error reading sector**"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                       GLOBAL DESCRIPTOR TABLE
@@ -129,37 +125,131 @@ gdt_start:                  ;0ffset + 0
         dw gdt_descriptor - gdt_start - 1   ;size
         dd gdt_start                        ;offset
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                           PROTECTED-MODE CODE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[BITS 32]
+
+_start32:
+    mov eax, 1              ;start loading from sector 1
+    mov cl, 100            ;100 sectors
+    mov edi, 0x0100000      ;address 1M
+    call ata_lba_read
+    jmp CODE_SEG:0x0100000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;EXPECTS:
+;eax: Logical Block Adress (LBA) of sector
+;cl: Number of sectors to read
+;edi: address of buffer for the data read
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ata_lba_read:
+    pushfd
+    push eax
+    push ebx
+    push ecx
+    push edx
+
+    and eax, 0x0fffffff     ;isolate 28 bit address
+    mov ebx, eax            ;Save full LBA to ebx
+
+    mov edx, 0x01f6         ;edx <- Port to send... 
+    shr eax, 24             ;... bits 24-27 of LBA
+    or al, 11100000b        ; Set bit 6 in al for LBA mode 
+                            ;and selects master drive
+    out dx, al            
+
+    mov eax, ebx            ;retrieve LBA address
+    mov edx, 0x01f5         ;edx <- Port to send ...
+    shr eax, 16             ;... bits 16-23 of LBA
+    out dx, al             
+
+    mov eax, ebx            ;retrieve LBA address
+    mov edx, 0x01f4         ;edx <- Port to send ...
+    shr eax, 8              ;... bits 8-15 of LBA
+    out dx, al              
+
+    mov eax, ebx            ;retrieve LBA address
+    mov edx, 0x01f3         ;edx <- Port to send bits 0-7 of LBA
+    out dx, al              
+    
+    mov eax, ebx            ;retrieve LBA address
+    mov edx, 0x01f2         ;edx <- Port to send number of sectors
+    mov al, cl
+    out dx, al              
+
+    mov edx, 0x1F7          ;edx <- Command port
+    mov al, 0x20            ;Read with retry.
+    out dx, al
+
+next_sector:
+    push ecx                ;save number of sectors
+
+wait_sector_buffer:
+    mov edx, 0x1F7          ;edx <- Status port
+    in al, dx               
+    test al, 0x8            ;bit 3 of status register, is set when...
+                            ;the drive has PIO data to transfer or receive
+    jz wait_sector_buffer
+
+    ;mov eax, 256            ;256*16 = 512 bytes (1 sector)
+    ;xor bx,bx               ;clear bx
+    ;mov bl, cl              ;get number of sectors
+    ;mul bx
+    mov ecx, 256            ;counter to be used by rep 256 16bit words
+    mov edx, 0x1f0          ;port to receive data from
+    rep insw                ;insw inputs 16bit word from edx port to edi address
+
+    pop ecx                 ;retrieve number of sectors
+    loop next_sector        ;same as dec ecx /jnz 
+
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    popfd
+
+    ret
+    
+title:
+    db 0x0a,0x0d,"***** BLR-OPHON BOSTALOADER *****", 0x0a, 0x0d, 0x0a, 0x0d, 0
+rm_start_m:
+    db "Starting in real mode...", 0x0a, 0x0d, 0
+pm_start_m:
+    db "Switching to protected mode...", 0x0a, 0x0d, 0
+lk_start_m:
+    db "Loading Kernel...", 0x0a, 0x0d, 0
+
 times 510-($-$$) db 0       ;fill remaining spaces with 0
 db 0x55, 0xaa               ;Boot signature
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                       0x200 offset sector
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-title:
-    db "***** BLR-OPHON BOSTALOADER VERSION 1.0 *****", 0x0a, 0x0d, 0
-markito:
-    db "        ####            ",0xa,0xd
-    db "      ##########        ",0xa,0xd
-    db "  ###################   ",0xa,0xd
-    db "  ####################  ",0xa,0xd
-    db " #####################  ",0xa,0xd
-    db "##########  ##########  ",0xa,0xd
-    db "#######       ########  ",0xa,0xd
-    db "####             #####  ",0xa,0xd
-    db " ##              #####  ",0xa,0xd
-    db "  #               ####  ",0xa,0xd
-    db "           ###########  ",0xa,0xd
-    db "  #################    #",0xa,0xd
-    db "  #####  ##########  # #",0xa,0xd
-    db "  #####  #########    # ",0xa,0xd
-    db "   ## #               # ",0xa,0xd
-    db "     #                  ",0xa,0xd
-    db "  #                     ",0xa,0xd
-    db "  #                     ",0xa,0xd
-    db "                #       ",0xa,0xd
-    db "    # #####  ##      #  ",0xa,0xd
-    db "      ##    ##          ",0xa,0xd
-    db "      ######       #    ",0xa,0xd
-    db "        ###             ",0xa,0xd 
-    db "       #                ",0xa,0xd
-    db "         #####          ",0xa,0xd,0
+;markito:
+;    db "        ####            ",0xa,0xd
+;    db "      ##########        ",0xa,0xd
+;    db "  ###################   ",0xa,0xd
+;    db "  ####################  ",0xa,0xd
+;    db " #####################  ",0xa,0xd
+;    db "##########  ##########  ",0xa,0xd
+;    db "#######       ########  ",0xa,0xd
+;    db "####             #####  ",0xa,0xd
+;    db " ##              #####  ",0xa,0xd
+;    db "  #               ####  ",0xa,0xd
+;    db "           ###########  ",0xa,0xd
+;    db "  #################    #",0xa,0xd
+;    db "  #####  ##########  # #",0xa,0xd
+;    db "  #####  #########    # ",0xa,0xd
+;    db "   ## #               # ",0xa,0xd
+;    db "     #                  ",0xa,0xd
+;    db "  #                     ",0xa,0xd
+;    db "  #                     ",0xa,0xd
+;    db "                #       ",0xa,0xd
+;    db "    # #####  ##      #  ",0xa,0xd
+;    db "      ##    ##          ",0xa,0xd
+;    db "      ######       #    ",0xa,0xd
+;    db "        ###             ",0xa,0xd 
+;    db "       #                ",0xa,0xd
+;    db "         #####          ",0xa,0xd,0
