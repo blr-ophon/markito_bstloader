@@ -51,7 +51,7 @@ _switch_to_protected:
     mov cr0, eax
     ; Perform far jump to selector 08h (offset into GDT, pointing at a 32bit PM code segment descriptor) 
     ; to load CS with proper PM32 descriptor)
-    jmp CODE_SEG:_start32
+    jmp CODE_SEG:load_kernel
 
     
     jmp _end
@@ -131,12 +131,14 @@ gdt_start:                  ;0ffset + 0
 
 [BITS 32]
 
-_start32:
+load_kernel:
+    ;the 100 sectors of data after boot code are loaded at address 0x1M of RAM.
     mov eax, 1              ;start loading from sector 1
-    mov cl, 100            ;100 sectors
+    mov cl, 100             ;100 sectors
     mov edi, 0x0100000      ;address 1M
     call ata_lba_read
-    jmp CODE_SEG:0x0100000
+    jmp CODE_SEG:0x0100000  ;jump to first line of kernel
+    ;kernel must be linked with it's first line at 0x1M
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;EXPECTS:

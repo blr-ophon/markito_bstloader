@@ -1,7 +1,8 @@
 ASM := nasm 
 ASMFLAGS := -g
 CC := i686-elf-gcc
-CFLAGS := -O0 -nostdlib -g
+CFLAGS := -Wall -Werror -O0 -nostdlib -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostartfiles -nodefaultlibs -Iinc
+INCLUDES := -I./includes
 
 SRC_DIR := ./src
 BIN_DIR := ./bin
@@ -38,7 +39,7 @@ ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 
 ${KERNEL_BIN}: ${KERNEL_ASM_O} ${KERNEL_O}
 	i686-elf-ld -g -relocatable $^ -o ${KERNEL_MERGED}
-	${CC} ${CFLAGS} -T ./src/linker.ld -o $@ -ffreestanding ${KERNEL_MERGED}
+	${CC} ${CFLAGS} -T ./src/linker.ld -o $@ ${KERNEL_MERGED}
 
 #Pattern Rules
 ${BUILD_DIR}/%.o: ${SRC_DIR}/%.c
