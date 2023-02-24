@@ -38,6 +38,7 @@ ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 
 
 ${KERNEL_BIN}: ${KERNEL_ASM_O} ${KERNEL_O}
+	#merge and link correct addresses to kernel files
 	i686-elf-ld -g -relocatable $^ -o ${KERNEL_MERGED}
 	${CC} ${CFLAGS} -T ./src/linker.ld -o $@ ${KERNEL_MERGED}
 
@@ -51,16 +52,16 @@ ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 	${ASM} ${ASMFLAGS} -f elf $< -o $@
 
 
-debugger: ${KERNEL_MERGED}
+debugger: ${OS_BIN}
 	cgdb -x ./debug/qemugdbinit 
 
 dump-boot: ${BOOT_BIN}
 	objdump -D -Mintel,i8086 -b binary -m i386 $<
 
-dump: ${KERNEL_BIN}
+dump: ${OS_BIN}
 	objdump -D -b binary -m i386 $<
 
-run: ${BOOT_BIN}
+run: ${OS_BIN}
 	qemu-system-x86_64 $< 
 
 clean: 

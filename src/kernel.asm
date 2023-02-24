@@ -1,7 +1,7 @@
 [BITS 32]
 
 global _start
-extern kernel_start
+extern kernel_main
 
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
@@ -25,7 +25,7 @@ _start:
     out 0x92, al
     
     ;switch to C compiled code section
-    call kernel_start
+    call kernel_main
 
     jmp $
 
