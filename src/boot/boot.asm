@@ -40,6 +40,7 @@ start_title:                ;Print title to test real mode
     call print_loop
     mov si, rm_start_m
     call print_loop
+    call keyboard_wait
 
 _switch_to_protected:
     mov si, pm_start_m
