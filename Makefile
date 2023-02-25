@@ -2,7 +2,7 @@ ASM := nasm
 ASMFLAGS := -g
 CC := i686-elf-gcc
 CFLAGS := -Wall -Werror -O0 -nostdlib -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostartfiles -nodefaultlibs -Iinc
-INCLUDES := -I./includes
+INCLUDES := -I./include
 
 SRC_DIR := ./src
 BIN_DIR := ./bin
@@ -30,7 +30,7 @@ ${BOOT_BIN}: ${BOOT_SRC}
 	${ASM} ${ASMFLAGS} -f bin $< -o $@
 
 ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
-	rm -rf {OS_BIN}
+	rm -rf $@
 	dd if=${BOOT_BIN} >> ${OS_BIN}
 	dd if=${KERNEL_BIN} >> ${OS_BIN}
 	#100 sectors of 512 bytes of zeroes
