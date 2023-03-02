@@ -4,7 +4,7 @@ IDT_Gate IDT[INTERRUPTS_TOTAL];         //Table of gate decriptors
 IDT_Descriptor idt_descriptor;                                    
 
 void ISR_zero(void){
-    vgam3_print("\ndivide by zero error\n", MAIN_M3_COLOR);
+    vgam3_print("\nERROR: zero division\n", MAIN_M3_COLOR);
 }
 
 void idt_set(int i, void *adr){

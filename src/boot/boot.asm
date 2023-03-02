@@ -202,9 +202,10 @@ wait_sector_buffer:
     ret
     
 title:
-    db 0x0a,0x0d,"***** BLR-OPHON BOSTALOADER *****", 0x0a, 0x0d, 0x0a, 0x0d, 0
+    db 0x0a,0x0d,"******* CURSED BOOTLOADER *******", 0x0a, 0x0d, 0x0a, 0x0d, 0
 rm_start_m:
-    db "Starting in real mode...", 0x0a, 0x0d, 0
+    db "Starting in real mode...", 0x0a, 0x0d
+    db "*Press any key to continue", 0x0a, 0x0d, 0
 pm_start_m:
     db "Switching to protected mode...", 0x0a, 0x0d, 0
 
