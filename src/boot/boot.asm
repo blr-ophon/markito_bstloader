@@ -25,16 +25,6 @@ _setup:
     mov sp, bp              ;Empty stack
     sti                     ;Enable interrupts
 
-    ;Read other sectors
-   ; mov ah, 2               ;INT 13/AH = 0x: Read sector into memory
-   ; mov bx, 0x7e00           ;Start adress
-   ; mov al, 2               ;number of sectors
-   ; mov ch, 0               ;Cylinder number
-   ; mov cl, 2               ;Sector number
-   ; mov dh, 0               ;Head number
-   ; int 0x13                ;Read sector 
-   ; jc read_s_error
-
 start_title:                ;Print title to test real mode
     mov si, title
     call print_loop
@@ -196,10 +186,6 @@ wait_sector_buffer:
                             ;the drive has PIO data to transfer or receive
     jz wait_sector_buffer
 
-    ;mov eax, 256            ;256*16 = 512 bytes (1 sector)
-    ;xor bx,bx               ;clear bx
-    ;mov bl, cl              ;get number of sectors
-    ;mul bx
     mov ecx, 256            ;counter to be used by rep 256 16bit words
     mov edx, 0x1f0          ;port to receive data from
     rep insw                ;insw inputs 16bit word from edx port to edi address
@@ -221,38 +207,6 @@ rm_start_m:
     db "Starting in real mode...", 0x0a, 0x0d, 0
 pm_start_m:
     db "Switching to protected mode...", 0x0a, 0x0d, 0
-lk_start_m:
-    db "Loading Kernel...", 0x0a, 0x0d, 0
 
 times 510-($-$$) db 0       ;fill remaining spaces with 0
 db 0x55, 0xaa               ;Boot signature
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                       0x200 offset sector
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;markito:
-;    db "        ####            ",0xa,0xd
-;    db "      ##########        ",0xa,0xd
-;    db "  ###################   ",0xa,0xd
-;    db "  ####################  ",0xa,0xd
-;    db " #####################  ",0xa,0xd
-;    db "##########  ##########  ",0xa,0xd
-;    db "#######       ########  ",0xa,0xd
-;    db "####             #####  ",0xa,0xd
-;    db " ##              #####  ",0xa,0xd
-;    db "  #               ####  ",0xa,0xd
-;    db "           ###########  ",0xa,0xd
-;    db "  #################    #",0xa,0xd
-;    db "  #####  ##########  # #",0xa,0xd
-;    db "  #####  #########    # ",0xa,0xd
-;    db "   ## #               # ",0xa,0xd
-;    db "     #                  ",0xa,0xd
-;    db "  #                     ",0xa,0xd
-;    db "  #                     ",0xa,0xd
-;    db "                #       ",0xa,0xd
-;    db "    # #####  ##      #  ",0xa,0xd
-;    db "      ##    ##          ",0xa,0xd
-;    db "      ######       #    ",0xa,0xd
-;    db "        ###             ",0xa,0xd 
-;    db "       #                ",0xa,0xd
-;    db "         #####          ",0xa,0xd,0
