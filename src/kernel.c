@@ -37,5 +37,6 @@ void screen_startup(void){
 
 void kernel_main(void){
     screen_startup();
+    idt_init();
 }
 

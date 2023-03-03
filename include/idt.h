@@ -34,4 +34,10 @@ typedef enum {
     IDT_FLAG_PRESENT            = 0x80
 } IDT_FLAGS;
 
+void idt_init(void);
+
+void idt_set(int i, void *adr);
+
+void ISR_handler_0(void);
+
 #endif

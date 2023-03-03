@@ -3,7 +3,10 @@
 IDT_Gate IDT[INTERRUPTS_TOTAL];         //Table of gate decriptors
 IDT_Descriptor idt_descriptor;                                    
 
-void ISR_zero(void){
+extern void idt_load(IDT_Descriptor *descriptor);   //call asm code to load lidt
+extern void ISR_wrapper_0();
+
+void ISR_handler_0(void){
     vgam3_print("\nERROR: zero division\n", MAIN_M3_COLOR);
 }
 
@@ -18,11 +21,12 @@ void idt_set(int i, void *adr){
     entry->offset_h = (((uint32_t)adr) & 0xffff0000) >> 16;
 }
 
-void idt_init(){
+void idt_init(void){
    n_memset(IDT, 0, sizeof(IDT)); 
    idt_descriptor.size = sizeof(IDT) - 1;
    idt_descriptor.offset = (uint32_t) IDT;
 
-   idt_set(0, ISR_zero);
+   idt_set(32, ISR_wrapper_0);
+   idt_load(&idt_descriptor);
 }
 

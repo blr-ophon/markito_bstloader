@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "qosclib.h"
+#include "idt.h"
 
 void screen_startup(void);
 
