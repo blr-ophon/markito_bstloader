@@ -2,7 +2,7 @@
 #define KERNEL_H
 
 #include <stdint.h>
-#include "qosclib.h"
+#include "vgam3.h"
 #include "idt.h"
 
 void screen_startup(void);

@@ -2,6 +2,7 @@
   {
     "arguments": [
       "/home/myshkin/opt/cross/bin/i686-elf-gcc",
+      "-fPIC",
       "-Wall",
       "-Werror",
       "-O0",
@@ -20,19 +21,24 @@
       "-Wno-cpp",
       "-Wno-unused-parameter",
       "-Iinc",
-      "-I./include",
+      "-I./src",
+      "-I./lib",
+      "-I./src/kernel",
+      "-I./src/kernel/isr",
+      "-I./lib/qosclib",
       "-c",
       "-o",
-      "build/idt.o",
-      "src/idt.c"
+      "./lib/qosclib/qosclib.o",
+      "lib/qosclib/mem.c"
     ],
     "directory": "/home/myshkin/Downloads/git/qrsedOS",
-    "file": "/home/myshkin/Downloads/git/qrsedOS/src/idt.c",
-    "output": "/home/myshkin/Downloads/git/qrsedOS/build/idt.o"
+    "file": "/home/myshkin/Downloads/git/qrsedOS/lib/qosclib/mem.c",
+    "output": "/home/myshkin/Downloads/git/qrsedOS/lib/qosclib/qosclib.o"
   },
   {
     "arguments": [
       "/home/myshkin/opt/cross/bin/i686-elf-gcc",
+      "-fPIC",
       "-Wall",
       "-Werror",
       "-O0",
@@ -51,14 +57,54 @@
       "-Wno-cpp",
       "-Wno-unused-parameter",
       "-Iinc",
-      "-I./include",
+      "-I./src",
+      "-I./lib",
+      "-I./src/kernel",
+      "-I./src/kernel/isr",
+      "-I./lib/qosclib",
       "-c",
       "-o",
-      "build/kernel.o",
-      "src/kernel.c"
+      "build/kernel/kernel.o",
+      "src/kernel/kernel.c"
     ],
     "directory": "/home/myshkin/Downloads/git/qrsedOS",
-    "file": "/home/myshkin/Downloads/git/qrsedOS/src/kernel.c",
-    "output": "/home/myshkin/Downloads/git/qrsedOS/build/kernel.o"
+    "file": "/home/myshkin/Downloads/git/qrsedOS/src/kernel/kernel.c",
+    "output": "/home/myshkin/Downloads/git/qrsedOS/build/kernel/kernel.o"
+  },
+  {
+    "arguments": [
+      "/home/myshkin/opt/cross/bin/i686-elf-gcc",
+      "-fPIC",
+      "-Wall",
+      "-Werror",
+      "-O0",
+      "-g",
+      "-ffreestanding",
+      "-falign-jumps",
+      "-falign-functions",
+      "-falign-labels",
+      "-falign-loops",
+      "-fstrength-reduce",
+      "-fomit-frame-pointer",
+      "-finline-functions",
+      "-Wno-unused-function",
+      "-fno-builtin",
+      "-Wno-unused-label",
+      "-Wno-cpp",
+      "-Wno-unused-parameter",
+      "-Iinc",
+      "-I./src",
+      "-I./lib",
+      "-I./src/kernel",
+      "-I./src/kernel/isr",
+      "-I./lib/qosclib",
+      "-c",
+      "-o",
+      "build/kernel/isr/idt.o",
+      "src/kernel/isr/idt.c"
+    ],
+    "directory": "/home/myshkin/Downloads/git/qrsedOS",
+    "file": "/home/myshkin/Downloads/git/qrsedOS/src/kernel/isr/idt.c",
+    "output": "/home/myshkin/Downloads/git/qrsedOS/build/kernel/isr/idt.o"
   }
 ]

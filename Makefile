@@ -2,7 +2,9 @@ ASM := nasm
 ASMFLAGS := -g
 CC := i686-elf-gcc
 CFLAGS := -Wall -Werror -O0 -nostdlib -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostartfiles -nodefaultlibs -Iinc
-INCLUDES := -I./include
+
+INCLUDES := -I./lib/qosclib -I./src -I./src/kernel -I./src/kernel/isr
+
 
 SRC_DIR := ./src
 BIN_DIR := ./bin
@@ -13,21 +15,20 @@ OS_BIN := ${BIN_DIR}/os.bin
 BOOT_SRC := ${SRC_DIR}/boot/boot.asm
 BOOT_BIN := ${BIN_DIR}/boot/boot.bin
 
-KERNEL_C := $(wildcard ./src/*.c)
-KERNEL_ASM := $(wildcard ./src/*.asm)
+KERNEL_C := $(shell find $(SRC_DIR)/kernel -name '*.c')
+KERNEL_ASM := $(shell find $(SRC_DIR)/kernel -name '*.asm')
 
 KERNEL_ASM_O := $(KERNEL_ASM:$(SRC_DIR)/%.asm=$(BUILD_DIR)/%.asm.o)
 KERNEL_O := $(KERNEL_C:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 KERNEL_MERGED := ${BUILD_DIR}/kernel_merged.o
 KERNEL_BIN := ${BIN_DIR}/kernel.bin
 
+QLIB_C := $(shell find ./lib/qosclib -name '*.c')
+QLIB_O := $(QLIB_C:%.c=%.o)
+QOSCLIB_O := ./lib/qosclib/QOSCLIB.o
 
 
 all: ${OS_BIN} 
-
-${BOOT_BIN}: ${BOOT_SRC}
-	mkdir -p $(dir $@)
-	${ASM} ${ASMFLAGS} -f bin $< -o $@
 
 ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 	rm -rf $@
@@ -37,10 +38,22 @@ ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 	dd if=/dev/zero bs=512 count=100 >> ${OS_BIN} 
 
 
-${KERNEL_BIN}: ${KERNEL_ASM_O} ${KERNEL_O}
+####### Boot section #######
+${BOOT_BIN}: ${BOOT_SRC}
+	mkdir -p $(dir $@)
+	${ASM} ${ASMFLAGS} -f bin $< -o $@
+
+####### Kernel section #######
+${KERNEL_BIN}: ${KERNEL_ASM_O} ${KERNEL_O} ${QOSCLIB_O}
 	#merge and link correct addresses to kernel files
 	i686-elf-ld -g -relocatable $^ -o ${KERNEL_MERGED}
-	${CC} ${CFLAGS} -T ./src/linker.ld -o $@ ${KERNEL_MERGED}
+	${CC} ${CFLAGS} ${INCLUDES} -T ./src/linker.ld -o $@ ${KERNEL_MERGED}
+
+${QOSCLIB_O}: ${QLIB_O}
+	i686-elf-ld -g -relocatable $^ -o $@
+
+
+
 
 #Pattern Rules
 ${BUILD_DIR}/%.o: ${SRC_DIR}/%.c
@@ -50,6 +63,8 @@ ${BUILD_DIR}/%.o: ${SRC_DIR}/%.c
 ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 	mkdir -p $(dir $@)
 	${ASM} ${ASMFLAGS} -f elf $< -o $@
+
+
 
 
 debugger: ${OS_BIN}
@@ -67,4 +82,5 @@ run: ${OS_BIN}
 clean: 
 	rm -rf ${BIN_DIR}/*
 	rm -rf ${BUILD_DIR}/*
+	rm -rf ${QOSCLIB_O}
 

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "config.h"
 #include "mem.h"
-#include "qosclib.h"
+#include "vgam3.h"
 
 typedef struct {
     uint16_t offset_l;              //address of Interrupt Service Routine

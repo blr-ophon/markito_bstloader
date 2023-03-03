@@ -1,4 +1,4 @@
-#include "qosclib.h"
+#include "vgam3.h"
 
 uint16_t *vga_m3_buffer = 0;
 int vga_text_x = 0;

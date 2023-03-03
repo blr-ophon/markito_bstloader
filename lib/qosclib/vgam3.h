@@ -1,5 +1,5 @@
-#ifndef QOSCLIB_H
-#define QOSCLIB_H
+#ifndef VGAM3_H
+#define VGAM3_H
 
 #define VGA_MODE3_W 80
 #define VGA_MODE3_H 25
