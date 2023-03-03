@@ -4,7 +4,7 @@ CC := i686-elf-gcc
 CFLAGS := -Wall -Werror -O0 -nostdlib -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostartfiles -nodefaultlibs -Iinc
 
 INCLUDES := -I./lib/qosclib -I./src -I./src/kernel -I./src/kernel/isr
-
+HEADERS := $(shell find ./ -name '*.h')
 
 SRC_DIR := ./src
 BIN_DIR := ./bin
@@ -23,6 +23,7 @@ KERNEL_O := $(KERNEL_C:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 KERNEL_MERGED := ${BUILD_DIR}/kernel_merged.o
 KERNEL_BIN := ${BIN_DIR}/kernel.bin
 
+#TODO: Turn qosclib int a static library and have a separate makefile
 QLIB_C := $(shell find ./lib/qosclib -name '*.c')
 QLIB_O := $(QLIB_C:%.c=%.o)
 QOSCLIB_O := ./lib/qosclib/QOSCLIB.o
@@ -53,18 +54,14 @@ ${QOSCLIB_O}: ${QLIB_O}
 	i686-elf-ld -g -relocatable $^ -o $@
 
 
-
-
 #Pattern Rules
-${BUILD_DIR}/%.o: ${SRC_DIR}/%.c
+${BUILD_DIR}/%.o: ${SRC_DIR}/%.c ${HEADERS}
 	mkdir -p $(dir $@)
 	$(CC) ${CFLAGS} ${INCLUDES} -c $< -o $@
 
 ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 	mkdir -p $(dir $@)
 	${ASM} ${ASMFLAGS} -f elf $< -o $@
-
-
 
 
 debugger: ${OS_BIN}
@@ -82,5 +79,6 @@ run: ${OS_BIN}
 clean: 
 	rm -rf ${BIN_DIR}/*
 	rm -rf ${BUILD_DIR}/*
+	rm -rf ${QLIB_O}
 	rm -rf ${QOSCLIB_O}
 
