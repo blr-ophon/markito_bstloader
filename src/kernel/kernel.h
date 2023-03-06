@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include "vgam3.h"
-#include "idt.h"
+#include "isr/idt.h"
+#include "io_routines/io_r.h"
 
 void screen_startup(void);
 

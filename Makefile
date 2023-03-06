@@ -3,7 +3,7 @@ ASMFLAGS := -g
 CC := i686-elf-gcc
 CFLAGS := -Wall -Werror -O0 -nostdlib -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-function -fno-builtin -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostartfiles -nodefaultlibs -Iinc
 
-INCLUDES := -I./lib/qosclib -I./src -I./src/kernel -I./src/kernel/isr
+INCLUDES := -I./lib/qosclib -I./src/kernel 
 HEADERS := $(shell find ./ -name '*.h')
 
 SRC_DIR := ./src
