@@ -2,7 +2,7 @@
 
 void screen_startup(void){
     vgam3_clear(MAIN_M3_COLOR);
-    char markito[] = "        ####            \n"
+    /*char markito[] = "        ####            \n"
                         "      ##########        \n"
                         "  ###################   \n"
                         "  ####################  \n"
@@ -27,11 +27,10 @@ void screen_startup(void){
                         "        ###             \n" 
                         "       #                \n"
                         "         #####          \n";
+    vgam3_write(markito, 40, 0, MAIN_M3_COLOR);*/
     char title1[] = "=========================\n"
                     "  CursedOS by BLR-OPHON\n"
-                    "=========================\n"
-                    ">Version 1.0\n";
-    vgam3_write(markito, 40, 0, MAIN_M3_COLOR);
+                    "=========================\n";
     vgam3_print(title1, MAIN_M3_COLOR);
 }
 

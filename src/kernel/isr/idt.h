@@ -6,7 +6,7 @@
 #include "mem.h"
 #include "vgam3.h"
 
-typedef struct {
+typedef struct { //entries in IDT
     uint16_t offset_l;              //address of Interrupt Service Routine
     uint16_t segment_selector;      //Point to valid code segment in GDT
     uint8_t reserved;               //ignored
@@ -14,7 +14,7 @@ typedef struct {
     uint16_t offset_h;              //address of Interrupt Service Routine
 }__attribute__((packed)) IDT_Gate;
 
-typedef struct {
+typedef struct { 
     uint16_t size;                  //size of the IDT with all it's entries
     uint32_t offset;                //address of the IDT
 }__attribute__((packed)) IDT_Descriptor;

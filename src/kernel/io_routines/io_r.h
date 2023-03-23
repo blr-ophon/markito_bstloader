@@ -11,4 +11,6 @@ void ior_outb(uint16_t port, uint8_t val);
 
 void ior_outbw(uint16_t port, uint8_t val);
 
+void ior_wait(void);
+
 #endif

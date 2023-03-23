@@ -11,6 +11,7 @@ void ISR_handler_0(void){
 }
 
 void idt_set(int i, void *adr){
+    //set entry i in Descriptor Table to adr
     IDT_Gate *entry = &IDT[i];      //get entry pointer
     entry->offset_l = ((uint32_t)adr) & 0x0000ffff;  
     entry->segment_selector = KERNEL_CODE_SELECTOR;
@@ -22,11 +23,14 @@ void idt_set(int i, void *adr){
 }
 
 void idt_init(void){
-   n_memset(IDT, 0, sizeof(IDT)); 
-   idt_descriptor.size = sizeof(IDT) - 1;
-   idt_descriptor.offset = (uint32_t) IDT;
+    n_memset(IDT, 0, sizeof(IDT));
 
-   idt_set(32, ISR_wrapper_0);
-   idt_load(&idt_descriptor);
+    //set ISRs
+    idt_set(32, ISR_wrapper_0);
+
+    //Load descriptor in IDT register
+    idt_descriptor.size = sizeof(IDT) - 1;      
+    idt_descriptor.offset = (uint32_t) IDT;
+    idt_load(&idt_descriptor);
 }
 
