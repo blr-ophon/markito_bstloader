@@ -1,9 +1,10 @@
 section .asm
-
 global ior_inb
 global ior_inw
 global ior_outb
 global ior_outw
+global ior_enable_interrupts
+global ior_disable_interrupts
 
 ior_inb:
     ;after new stack frame is set, parameters are accessed by 
@@ -61,4 +62,12 @@ ior_outw:
 
     mov esp, ebp        ;deallocate local variables
     pop ebp             ;cleanup stack frame/ LEAVE
+    ret
+
+ior_enable_interrupts:
+    sti
+    ret
+
+ior_disable_interrupts:
+    cli 
     ret

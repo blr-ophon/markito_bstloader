@@ -13,4 +13,8 @@ void ior_outbw(uint16_t port, uint8_t val);
 
 void ior_wait(void);
 
+void ior_enable_interrupts(void);
+
+void ior_disable_interrupts(void);
+
 #endif

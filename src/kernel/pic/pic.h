@@ -12,7 +12,7 @@
  * PIC required 4 initialization command words (ICW1-4), with 3 and 4 being optional.
  */
 
-enum{
+typedef enum{
     ICW1_ICW4       = 0x01,         //set if ICW4 is needed before initialization (see datasheet)
     ICW1_SINGLE     = 0x02,         //single/cascade mode
     ICW1_INTERVAL   = 0x04,         //ignored on x86. Set to zero
@@ -20,7 +20,7 @@ enum{
     ICW1_INIT       = 0x10          //initialize PIC
 } PIC_ICW1;
 
-enum{
+typedef enum{
     ICW4_8086               = 0x01,         //(1)8086/8088 Mode or (0)MCS 80/85 MODE
     ICW4_AUTO_EOI           = 0x02,         //auto or normal end of interrupt
     ICW4_BUFFERED_SLAVE     = 0x08, //Not important for x86
@@ -31,10 +31,26 @@ enum{
 //OPERATION COMMAND WORDS
 //after initialization, 8259 can accept interrupts and be modified via OCWs
 //OCW1 deals with masks
-enum{
+typedef enum{
     OCW2_EOI        = 0x20,         //End Of Interrupt
     OCW2_READ_IRR   = 0x0a,         //IRQ Request Register
     OCW2_READ_ISR   = 0x0a          //InService Register
 } PIC_OCW2;
+
+
+void PIC_init(uint8_t Mpic_offset, uint8_t Spic_offset);
+
+void PIC_Mask(int irq_x);
+
+void PIC_unMask(int irq_x);
+
+void PIC_Disable(void);
+
+void PIC_Send_EOI(int irq);
+
+uint16_t PIC_readIRR(void);
+
+uint16_t PIC_readISR(void);
+
 
 #endif

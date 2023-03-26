@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+extern void int_test();
+
 void screen_startup(void){
     vgam3_clear(MAIN_M3_COLOR);
     /*char markito[] = "        ####            \n"
@@ -35,7 +37,8 @@ void screen_startup(void){
 }
 
 void kernel_main(void){
-    screen_startup();
     idt_init();
+    screen_startup();
+    //int_test();
 }
 

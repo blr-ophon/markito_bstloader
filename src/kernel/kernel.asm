@@ -1,7 +1,7 @@
 [BITS 32]
 
 global _start
-global _test
+global int_test
 extern kernel_main
 
 CODE_SEG equ 0x08
@@ -29,5 +29,9 @@ _start:
     call kernel_main
 
     jmp $
+
+int_test:
+    int 20
+    ret
 
 times 512-($-$$) db 0       ;to keep C compiled code aligned

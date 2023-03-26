@@ -5,6 +5,8 @@
 #include "config.h"
 #include "mem.h"
 #include "vgam3.h"
+#include "io_routines/irq.h"
+#include "io_routines/io_r.h"
 
 typedef struct { //entries in IDT
     uint16_t offset_l;              //address of Interrupt Service Routine
