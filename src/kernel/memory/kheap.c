@@ -1,6 +1,6 @@
 #include "kheap.h"
 
-struct heap kernel_heap;
+struct heap_des kernel_heap;
 struct heap_entry_table kernel_het;
 
 void kheap_init(void){

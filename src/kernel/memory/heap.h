@@ -20,11 +20,13 @@ struct heap_entry_table{
     size_t total;
 };
 
-struct heap{
+struct heap_des{
     struct heap_entry_table *table;
     void *addr;
 };
 
-int heap_create(struct heap *heap, void *ptr, void *end, struct heap_entry_table *table);
+int heap_create(struct heap_des *heapd, void *ptr, void *end, struct heap_entry_table *table);
+void *n_malloc(struct heap_des *heapd, size_t size);
+void n_free(struct heap_des *heapd, size_t size);
 
 #endif
