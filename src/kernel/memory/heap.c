@@ -52,6 +52,9 @@ static uint32_t blockAlign(uint32_t adr){
 void *n_malloc(struct heap_des *heapd, size_t size){
     size_t blocks_size = blockAlign(size);
     uint32_t wanted_blocks = blocks_size/HEAP_BLOCK_SIZE;
+    if(wanted_blocks == 0){
+        return NULL;
+    }
 
 
     //Find free blocks that can be allocated
@@ -84,6 +87,7 @@ void *n_malloc(struct heap_des *heapd, size_t size){
 
     //Mark allocated blocks as taken
     size_t j = 0;
+    table->entries[start_index + j] |= HET_BLOCK_IS_FIRST; 
     for(; j < wanted_blocks - 1; j++){
         table->entries[start_index + j] |= HET_BLOCK_TAKEN; 
         table->entries[start_index + j] |= HET_BLOCK_HAS_NEXT; 
@@ -94,5 +98,22 @@ void *n_malloc(struct heap_des *heapd, size_t size){
     return (void*) start_address;
 }
 
-void n_free(struct heap_des *heapd, size_t size){
+void n_free(struct heap_des *heapd, void *adr){
+    //Validate adr
+    if(!heap_isAligned(adr)){
+        return; 
+    }
+    struct heap_entry_table *table = heapd->table;
+
+    //get entry table index for adr
+    int entry_index = (((uint32_t) adr) - (uint32_t) heapd->addr)/HEAP_BLOCK_SIZE;
+    
+    size_t i = entry_index;
+    table->entries[i] &= ~(HET_BLOCK_IS_FIRST);
+    while(table->entries[i] & HET_BLOCK_HAS_NEXT){
+        table->entries[i] &= ~(HET_BLOCK_HAS_NEXT);
+        table->entries[i] &= ~(HET_BLOCK_TAKEN);
+        i++;
+    }
+    table->entries[i] &= ~(HET_BLOCK_TAKEN);
 }

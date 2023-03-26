@@ -8,10 +8,12 @@
 #include "mem.h"
 
 //HET = Heap Entry Table
+//first 2 bits specify entry type
+//last 2 bits are used by taken blocks to mark start and finish of allocated space
 #define HET_BLOCK_TAKEN     0x01
 #define HET_BLOCK_FREE      0x00
 #define HET_BLOCK_HAS_NEXT  (0x01 << 7)
-#define HET_BLOCK_IS_FREE   (0x01 << 6)
+#define HET_BLOCK_IS_FIRST  (0x01 << 6)
 
 typedef unsigned char HET_BLOCK;
 
@@ -27,6 +29,6 @@ struct heap_des{
 
 int heap_create(struct heap_des *heapd, void *ptr, void *end, struct heap_entry_table *table);
 void *n_malloc(struct heap_des *heapd, size_t size);
-void n_free(struct heap_des *heapd, size_t size);
+void n_free(struct heap_des *heapd, void *adr);
 
 #endif
