@@ -27,19 +27,19 @@ ISR_wrapper_0:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
 IRQ_wrapper_21:
-    cli
+;    cli
     pushad
     call IRQ_handler_21
     popad
-    sti
+;    sti
     iret
 
 IRQ_wrapper_noIRQ:
-    cli
+;    cli
     pushad
     call IRQ_handler_noIRQ
     popad
-    sti
+;    sti
     iret
 
 

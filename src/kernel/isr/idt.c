@@ -28,6 +28,7 @@ void idt_set(int i, void *adr){
 }
 
 void idt_init(void){
+    ior_disable_interrupts();
     irq_init();
     n_memset(IDT, 0, sizeof(IDT));
     for(int i = 0; i < INTERRUPTS_TOTAL; i++){
@@ -42,5 +43,6 @@ void idt_init(void){
     idt_descriptor.size = sizeof(IDT) - 1;      
     idt_descriptor.offset = (uint32_t) IDT;
     idt_load(&idt_descriptor);
+    ior_enable_interrupts();
 }
 

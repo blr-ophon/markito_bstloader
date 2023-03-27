@@ -7,7 +7,7 @@ void irq_init(void){
 
     //TODO: register ISR handlers for each of the 16 irq lines
 
-    ior_enable_interrupts();
+    //ior_enable_interrupts();
 }
 
 void IRQ_handler_noIRQ(void){

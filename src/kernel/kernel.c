@@ -42,13 +42,5 @@ void kernel_main(void){
     idt_init();
     kheap_init();
     screen_startup();
-
-    void *ptr = kmalloc(50);
-    void *ptr2 = kmalloc(50);
-    void *ptr3 = kmalloc(50);
-    if(ptr || ptr2 || ptr3){
-    }
-
-    //int_test();
 }
 
