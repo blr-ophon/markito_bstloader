@@ -35,17 +35,17 @@ int heap_create(struct heap_des *heapd, void *ptr, void *end, struct heap_entry_
         goto out;
     }
 
-    n_memset(table, HET_BLOCK_FREE, HET_TOTAL);
-
 out:
     return res;
 }
 
-static uint32_t blockAlign(uint32_t adr){
-    if(adr % HEAP_BLOCK_SIZE){
-        return adr;
+static uint32_t blockAlign(size_t n){
+    //return space that must be allocated in bytes, in multiples
+    //of HEAP_BLOCK_SIZE
+    if(n % HEAP_BLOCK_SIZE == 0){
+        return n;
     }
-    return (adr/HEAP_BLOCK_SIZE + 1) * HEAP_BLOCK_SIZE;
+    return (n/HEAP_BLOCK_SIZE + 1) * HEAP_BLOCK_SIZE;
 }
 
 
