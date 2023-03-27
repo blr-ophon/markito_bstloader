@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "vgam3.h"
 #include "isr/idt.h"
+#include "memory/kheap.h"
 
 void screen_startup(void);
 

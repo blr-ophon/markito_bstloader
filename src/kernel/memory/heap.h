@@ -28,7 +28,7 @@ struct heap_des{
 };
 
 int heap_create(struct heap_des *heapd, void *ptr, void *end, struct heap_entry_table *table);
-void *n_malloc(struct heap_des *heapd, size_t size);
-void n_free(struct heap_des *heapd, void *adr);
+void *heap_malloc(struct heap_des *heapd, size_t n);
+void heap_free(struct heap_des *heapd, void *adr);
 
 #endif

@@ -49,8 +49,8 @@ static uint32_t blockAlign(uint32_t adr){
 }
 
 
-void *n_malloc(struct heap_des *heapd, size_t size){
-    size_t blocks_size = blockAlign(size);
+void *heap_malloc(struct heap_des *heapd, size_t n){
+    size_t blocks_size = blockAlign(n);
     uint32_t wanted_blocks = blocks_size/HEAP_BLOCK_SIZE;
     if(wanted_blocks == 0){
         return NULL;
@@ -98,7 +98,7 @@ void *n_malloc(struct heap_des *heapd, size_t size){
     return (void*) start_address;
 }
 
-void n_free(struct heap_des *heapd, void *adr){
+void heap_free(struct heap_des *heapd, void *adr){
     //Validate adr
     if(!heap_isAligned(adr)){
         return; 
