@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+//TODO: heap_create is causing panic
+
 extern void int_test();
 
 void screen_startup(void){

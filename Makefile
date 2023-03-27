@@ -74,7 +74,7 @@ dump: ${OS_BIN}
 	objdump -D -b binary -m i386 $<
 
 run: ${OS_BIN}
-	qemu-system-x86_64 $< 
+	qemu-system-i386 $< 
 
 clean: 
 	rm -rf ${BIN_DIR}/*
