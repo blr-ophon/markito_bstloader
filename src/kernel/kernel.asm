@@ -25,7 +25,6 @@ _start:
     or al, 2
     out 0x92, al
     
-    cli
     ;switch to C compiled code section
     call kernel_main
 

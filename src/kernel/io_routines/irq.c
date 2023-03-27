@@ -17,5 +17,4 @@ void IRQ_handler_noIRQ(void){
 void IRQ_handler_21(void){
     vgam3_print("Key pressed\n", MAIN_M3_COLOR);
     ior_outb(0x20, 0x20);   //Acknowledge
-
 }

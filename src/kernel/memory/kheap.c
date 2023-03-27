@@ -23,6 +23,12 @@ void *kmalloc(size_t n){
     return heap_malloc(&kernel_heap, n);
 }
 
+void *kzalloc(size_t n){
+    void *ptr = kmalloc(n);
+    n_memset(ptr, 0, n);
+    return ptr;
+}
+
 void kfree(void *adr){
     heap_free(&kernel_heap, adr);
 }
