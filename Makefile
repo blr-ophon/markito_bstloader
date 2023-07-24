@@ -67,10 +67,14 @@ ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 debugger: ${OS_BIN}
 	cgdb -x ./debug/qemugdbinit 
 
+tags: ${OS_BIN}
+	ctags -R
+	cscope -R
+
 dump-boot: ${BOOT_BIN}
 	objdump -D -Mintel,i8086 -b binary -m i386 $<
 
-dump: ${OS_BIN}
+dump-bin: ${OS_BIN}
 	objdump -D -b binary -m i386 $<
 
 run: ${OS_BIN}
@@ -81,4 +85,5 @@ clean:
 	rm -rf ${BUILD_DIR}/*
 	rm -rf ${QLIB_O}
 	rm -rf ${QOSCLIB_O}
+	rm -f ./tags ./cscope.out
 
