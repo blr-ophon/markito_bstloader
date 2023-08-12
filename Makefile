@@ -30,6 +30,7 @@ QOSCLIB_O := ./lib/qosclib/QOSCLIB.o
 
 
 all: ${OS_BIN} 
+	ctags -R
 
 ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 	rm -rf $@
