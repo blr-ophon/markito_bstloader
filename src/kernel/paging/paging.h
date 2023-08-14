@@ -11,6 +11,10 @@
  * all of them have addresses ending with 0x000, that's why they are 
  * represented with only 20 bits (32 - 12).
  *
+ *
+ * To enable 32-bit paging, all that is needed is to load cr3
+ * with the address of the page directory and to set the paging
+ * (PG) and protection (PE) bits of cr0.
  */
 
 #include <stdint.h>
@@ -39,10 +43,22 @@ typedef enum {
     PTE_FLAG_PAT               = (1 << 12),    //Page Attribute Table. If set, PAT, PCD and
 } PAGE_FLAGS;
 
+
+
 /*
  * Creates a page directory with all pages set with 'flags'.
  * Returns directory.
  */
 struct page_dir *page_dir_init(uint8_t flags);
+
+void page_set_dir(uint32_t *pd);
+
+
+/*
+ * ASM functions
+ */
+
+void page_enable();
+void page_load_dir(uint32_t *pd);
 
 #endif

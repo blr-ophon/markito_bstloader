@@ -1,12 +1,16 @@
 #include "paging/paging.h"
 
+uint32_t *current_pd = NULL;
+
+
 /*
- * Creates a page directory with all pages set with 'flags'.
+ * Creates a page directory with all pages set with 'flags' and RW flags
  * Returns directory.
  */
 struct page_dir *page_dir_init(uint8_t flags){
     //Directory with 1024 pdes (aka page tables)
-    uint32_t *page_tables = kzalloc(sizeof(uint32_t) * PAGE_TABLE_TOTAL); 
+    struct page_dir *page_dir = kzalloc(sizeof(struct page_dir));
+    page_dir->page_tables = kzalloc(sizeof(uint32_t) * PAGE_TABLE_TOTAL); 
 
     int offset = 0;
     for(int i = 0; i < PAGE_TABLE_TOTAL; i++){
@@ -20,14 +24,20 @@ struct page_dir *page_dir_init(uint8_t flags){
         }
 
         //set pde in page directory
-        page_tables[i] = (uint32_t)pde | flags | PTE_FLAG_RW;
+        page_dir->page_tables[i] = (uint32_t)pde | flags | PTE_FLAG_RW;
 
         //offset for next pde
         offset += PTE_PER_TABLE * PAGE_SIZE;
     }
 
-    struct page_dir *page_dir = kzalloc(sizeof(struct page_dir));
-    page_dir->page_tables = page_tables;
-    
     return page_dir;
+}
+
+
+/*
+ * Sets pd as the system's page directory
+ */
+void page_set_dir(uint32_t *pd){
+    page_load_dir(pd);
+    current_pd = pd;
 }

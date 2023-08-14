@@ -38,9 +38,26 @@ void screen_startup(void){
     vgam3_print(title1, MAIN_M3_COLOR);
 }
 
+static struct page_dir *Page_dir_32;
+
 void kernel_main(void){
-    idt_init();
-    kheap_init();
     screen_startup();
+
+    //Initialize heap
+    kheap_init();
+
+    //Initialize Interrupt Descriptor Table
+    idt_init();
+
+
+
+    //Create a page directory for kernel
+    Page_dir_32 = page_dir_init(PTE_FLAG_RW | PTE_FLAG_P | PTE_FLAG_US);
+
+    //Set Page_dir_32 as the page directory
+    page_set_dir(Page_dir_32->page_tables);
+
+    //Enable paging
+    page_enable();
 }
 
