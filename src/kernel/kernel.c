@@ -52,10 +52,15 @@ void kernel_main(void){
 
 
     //Create a page directory for kernel
-    Page_dir_32 = page_dir_init(PTE_FLAG_RW | PTE_FLAG_P | PTE_FLAG_US);
+    Page_dir_32 = page_dir_init(PDE_FLAG_RW | PDE_FLAG_P | PDE_FLAG_US,
+                                PTE_FLAG_RW | PTE_FLAG_P | PTE_FLAG_US);
 
     //Set Page_dir_32 as the page directory
     page_set_dir(Page_dir_32->page_tables);
+
+    char *ptr = kzalloc(4096);
+    page_set(Page_dir_32->page_tables, (void*) 0x1000, 
+            (uint32_t)ptr | PTE_FLAG_RW | PTE_FLAG_P | PTE_FLAG_US);
 
     //Enable paging
     page_enable();
