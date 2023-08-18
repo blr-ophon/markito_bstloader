@@ -3,25 +3,45 @@
 
 #include <stdint.h>
 #include "io_routines/io_r.h"
+#include "string.h"
+#include "config.h"
+#include "status.h"
 
 /*
  * Data is read and written in sectors. Typically 521 bytes
  * LBA: Logical block address. LBA 0 = first sector and so on.
- *
- * Ports:
- * 0x1f6: Bits 24-27 of LBA (lower nibble). Commands (Higher nibble) 
- * 0x1f5: Bits 16-23 of LBA
- * 0x1f4: Bits 8-15 of LBA
- * 0x1f3: Bits 0-7 of LBA
- * 0x1f2: Number of sectors
- * 0x1f7: Command(W)/Status(R) port
- *        bit 3 of status register is set when the drive has...
- *        ... PIO data to transfer or receiver
+ * LBA is sent through ports 0x1f2 to 0x1f6. The higher nibble
+ * of 0x1f6 and 0x1f7 are for command/status
  */
 
+typedef enum{
+    DISK_TYPE_REAL = 0,
+}DISK_TYPE;
 
-int disk_read_sector(uint32_t lba, uint8_t n, void *buf);
+struct disk{
+    DISK_TYPE type;
+    int sector_size;
+};
 
+
+
+/*
+ * Initializes primary disk
+ * TODO: Multiple disks not implemented yet
+ */
+void disk_search_and_init(void);
+
+/*
+ * Returns pointer to disk in index i
+ * TODO: Multiple disks not implemented yet
+ */
+struct disk* disk_get(int index);
+
+/*
+ * Reads n sectors from specified disk and stores data in buf
+ * TODO: Multiple disks not implemented yet
+ */
+int disk_sector_read(struct disk* idisk, uint32_t lba, uint8_t n, void *buf);
 
 
 #endif

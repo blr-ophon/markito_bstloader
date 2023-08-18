@@ -12,4 +12,7 @@
 #define HEAP_TABLE_ADDR     0x00007e00  //conventional memory block in real mode address space(<1 MiB)
 #define HEAP_ADDR           0x01000000  //free for use RAM in extended memory (>1 MiB)
 
+
+#define SECTOR_SIZE 512
+
 #endif

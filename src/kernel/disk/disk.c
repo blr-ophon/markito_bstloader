@@ -1,11 +1,53 @@
 #include "disk/disk.h"
+//TODO: sector hexdump
+//TODO: implement multiple disks
 
-//TODO: sector dump
+
+int ata_read_lba(uint32_t lba, uint8_t n, void *buf);
+
+struct disk disk;   //global variable with main disk
+
+/*
+ * Initializes primary disk
+ */
+void disk_search_and_init(void){
+    n_memset(&disk, 0, sizeof(disk));
+    disk.type = DISK_TYPE_REAL;
+    disk.sector_size = SECTOR_SIZE;
+}
+
+/*
+ * Returns pointer to disk in index i
+ * TODO: Multiple disks not implemented yet
+ */
+struct disk* disk_get(int index){
+    if(index != 0){
+        return 0;
+    }
+
+    return &disk;
+}
+
+
+
+/*
+ * Reads n sectors from specified disk and stores data in buf
+ * TODO: Multiple disks not implemented yet
+ */
+int disk_sector_read(struct disk* idisk, uint32_t lba, uint8_t n, void *buf){
+    if(idisk != &disk){
+        return -EIO;
+    }
+
+    return ata_read_lba(lba, n, buf);
+}
+
+
 
 /*
  * Read n sectors starting from lba and stores in buf
  */
-int disk_read_sector(uint32_t lba, uint8_t n, void *buf){
+int ata_read_lba(uint32_t lba, uint8_t n, void *buf){
     //Bits 24-27 of LBA (lower nibble). Set bit 6 in al for LBA mode (higher nibble)
     ior_outb(0x1f6, (lba >> 24) | 0xe0);
     //Bits 16-23 of LBA
@@ -42,4 +84,6 @@ int disk_read_sector(uint32_t lba, uint8_t n, void *buf){
 
     return 0;
 }
+
+
 
