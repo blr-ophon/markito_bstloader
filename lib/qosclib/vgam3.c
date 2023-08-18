@@ -15,7 +15,9 @@ void vgam3_clear(uint8_t color){
     }
 }
 
-
+/*
+ * Prints string c at position x,y
+ */
 void vgam3_write(char *c, int x, int y, uint8_t color){
     int c_x = x;
     int c_y = y;
@@ -28,6 +30,9 @@ void vgam3_write(char *c, int x, int y, uint8_t color){
     }
 }
 
+/*
+ * Prints string c at cursor position
+ */
 void vgam3_print(char *c, uint8_t color){
     for(int i = 0; c[i] != 0; i++){
         uint16_t full_char = ((uint16_t)color << 8) | c[i];

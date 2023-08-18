@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "config.h"
-#include "mem.h"
+#include "string.h"
 #include "vgam3.h"
 #include "io_routines/irq.h"
 #include "io_routines/io_r.h"

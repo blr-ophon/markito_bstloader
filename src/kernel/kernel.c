@@ -64,5 +64,15 @@ void kernel_main(void){
 
     //Enable paging
     page_enable();
+
+    /*
+     * PAGING test
+     */
+    //write in virtual address 0x1000
+    char *ptr2 = (char*) 0x1000;
+    char *ptest_string = "> Paging OK\n";
+    n_memcpy(ptr2, ptest_string, n_strlen(ptest_string));
+    //read from physical address to see if has been modified
+    vgam3_print(ptr, MAIN_M3_COLOR);
 }
 

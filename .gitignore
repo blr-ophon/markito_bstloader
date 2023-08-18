@@ -1,6 +1,7 @@
 /build
 /bin
 /compile_commands.json
+/lib/qosclib/*.o
 
 cscope.out
 tags

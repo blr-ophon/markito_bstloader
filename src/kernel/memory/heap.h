@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "config.h"
 #include "status.h"
-#include "mem.h"
+#include "string.h"
 
 //HET = Heap Entry Table
 //first 2 bits specify entry type
