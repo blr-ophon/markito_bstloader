@@ -3,6 +3,7 @@
 
 #define ALL_OK 0    
 #define EIO 1
-#define EINVARG 2       //invalid argument
+#define EINVARG 2        //invalid argument
+#define EBADPATH 3       
 
 #endif

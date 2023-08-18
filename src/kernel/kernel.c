@@ -1,6 +1,7 @@
 #include "kernel.h"
 
 //TODO: heap_create is causing panic
+//TODO: check for memory leaks
 
 extern void int_test();
 
@@ -74,5 +75,11 @@ void kernel_main(void){
     n_memcpy(ptr2, ptest_string, n_strlen(ptest_string));
     //read from physical address to see if has been modified
     vgam3_print(ptr, MAIN_M3_COLOR);
+
+
+
+
+    struct path_root *path __attribute__((unused)) = pparser_parsePath("0:/foo/bar");
+    path = NULL;
 }
 
