@@ -1,4 +1,5 @@
 #include "pathparser.h"
+#include <ctype.h>
 #include "string.h"
 
 #define MAX_PATH_SIZE 128        //TODO: move definition
