@@ -79,7 +79,7 @@ void kernel_main(void){
 
 
 
-    struct path_root *path __attribute__((unused)) = pparser_parsePath("0:/foo/bar");
+    struct path_root *path __attribute__((unused)) = pparser_parsePath("0:/foo/bar/");
     path = NULL;
 }
 

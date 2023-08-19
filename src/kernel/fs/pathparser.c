@@ -4,7 +4,6 @@
 #define MAX_FILENAME_SIZE   128 
 
 //TODO: validate path name
-//TODO: free path name
 
 /*
  * Path format is:  x:/foo/bar/...
@@ -40,6 +39,14 @@ out:
     return rv;
 }
 
+void pparser_free(struct path_root *root){
+    struct path_token *node = root->first;
+    while(node){
+        struct path_token *tmp = node->next;
+        kfree(node);
+        node = tmp;
+    }
+}
 
 /*
  * Parse path string
