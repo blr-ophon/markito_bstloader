@@ -43,6 +43,7 @@ out:
     return rv;
 }
 
+
 void pparser_free(struct path_root *root){
     struct path_token *node = root->first;
     while(node){
@@ -52,17 +53,18 @@ void pparser_free(struct path_root *root){
     }
 }
 
+
 /*
  * Parse path string
  */
-struct path_root *pparser_parsePath(const char *pathstr){
+struct path_root *pparser_parsePath(const char *path, const char *cd_path){
     if(pparser_ValidatePath < 0){ 
         return NULL;
     }
 
-    size_t plen = n_strnlen(pathstr, MAX_PATH_SIZE);
+    size_t plen = n_strnlen(path, MAX_PATH_SIZE);
     char *pathstr_dup = kzalloc(plen+1);
-    n_memcpy(pathstr_dup, (void*)pathstr, plen);
+    n_memcpy(pathstr_dup, (void*)path, plen);
 
     int read_chars = 0;
     struct path_root *root = kzalloc(sizeof(struct path_root));
@@ -75,8 +77,8 @@ struct path_root *pparser_parsePath(const char *pathstr){
         pathstr_dup ++;
     }
     root->drive_no = disk_no;
-    read_chars += 1;
-    pathstr_dup += 1;
+    read_chars += 2;
+    pathstr_dup += 2;
 
 
     //parse Tokens

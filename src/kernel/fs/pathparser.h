@@ -18,6 +18,7 @@ struct path_token{
 };
 
 
-struct path_root *pparser_parsePath(const char *pathstr);
+struct path_root *pparser_parsePath(const char *path, const char *cd_path);
+void pparser_free(struct path_root *root);
 
 #endif
