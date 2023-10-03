@@ -79,7 +79,9 @@ int n_atoi(const char *s){
 
     //10 is the maximum number of digits a 32bit signed number
     //can have
-    size_t len = n_strnlen(&s[sign_offset], 10);
+    int len; 
+    for(len = 0; n_isdigit(s[len]) && len < 10; len++){
+    }
     if(len == 0) return 0;
 
     for(int k = len -1 + sign_offset; k >= 0 + sign_offset; k--){

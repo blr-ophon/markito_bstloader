@@ -52,6 +52,7 @@ bool page_is_aligned(void *addr){
     return ((uint32_t) addr % PAGE_SIZE) == 0;
 }
 
+
 /*
  * Sets variables with the index of the page table in the directory and the index of the page in
  * the page table
@@ -73,9 +74,10 @@ out:
     return res;
 }
 
+
 /*
- * Set page in specified virtual address to val. virt_addr must be 
- * aligned to 4096
+ * Set page in specified virtual address to val (physical address + flags)
+ * virt_addr must be aligned to 4096
  */
 int page_set(uint32_t *pd, void *virt_addr, uint32_t val){
     int res = 0;

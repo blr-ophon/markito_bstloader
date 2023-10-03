@@ -19,6 +19,8 @@ static int pparser_ValidatePath(const char *pathstr){
         rv = -EBADPATH;
         goto out;
     }
+    /*
+     * checked during parsing
     if(!n_isdigit(pathstr[0])){ 
         rv = -EBADPATH;
         goto out;
@@ -27,6 +29,7 @@ static int pparser_ValidatePath(const char *pathstr){
         rv = -EBADPATH;
         goto out;
     }
+    */
 
     for(int i = 0; i < len; i ++){
         if(!n_isascii(pathstr[i])){
@@ -64,11 +67,21 @@ struct path_root *pparser_parsePath(const char *pathstr){
     int read_chars = 0;
     struct path_root *root = kzalloc(sizeof(struct path_root));
 
+
     //parse Drive 
     int disk_no = n_atoi(pathstr_dup);
+    while(n_isdigit(*pathstr_dup)){
+        read_chars++;
+        pathstr_dup ++;
+    }
+    if(read_chars == 0 || *(pathstr_dup) != ':' || *(pathstr_dup+1) != '/'){
+        //not in the format: (num):/
+        return NULL;
+    }
     root->drive_no = disk_no;
-    read_chars += 3;
-    pathstr_dup += 3;
+    read_chars += 2;
+    pathstr_dup += 2;
+
 
     //parse Tokens
     struct path_token *p = kzalloc(sizeof(struct path_token));

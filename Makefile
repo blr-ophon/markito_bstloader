@@ -65,7 +65,7 @@ ${BUILD_DIR}/%.asm.o: ${SRC_DIR}/%.asm
 	${ASM} ${ASMFLAGS} -f elf $< -o $@
 
 
-debugger: ${OS_BIN}
+debug: ${OS_BIN}
 	cgdb -x ./debug/qemugdbinit 
 
 maps: ${OS_BIN}
