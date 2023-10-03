@@ -3,39 +3,40 @@
 #define MAX_PATH_SIZE       128        //TODO: move definition
 #define MAX_FILENAME_SIZE   128 
 
-//TODO: validate path name
-
 /*
- * Path format is:  x:/foo/bar/...
- * where x is the disk/partition 
+ * Validate that a path is in the format:  (num):/foo/bar/...
+ * where (num) is the disk/partition 
  */
 static int pparser_ValidatePath(const char *pathstr){
-    //TODO: check other cases like empty pathname "0:/foo//bar"
-    //more than 1 use of ':', use of whitespace and control words etc
-    //should probably chech word by word while parsing the names
     int rv = 0;
     int len = n_strnlen(pathstr, MAX_PATH_SIZE);
     if(len < 3){ 
         rv = -EBADPATH;
         goto out;
     }
-    /*
-     * checked during parsing
-    if(!n_isdigit(pathstr[0])){ 
-        rv = -EBADPATH;
-        goto out;
-    }
-    if(n_memcmp((void*)&pathstr[1], ":/", 2)){
-        rv = -EBADPATH;
-        goto out;
-    }
-    */
 
+    //Filenames can have any ascii characters except control characters 
     for(int i = 0; i < len; i ++){
-        if(!n_isascii(pathstr[i])){
+        if(!n_isascii(pathstr[i]) || n_iscntrl(pathstr[i])){
             rv = -EBADPATH;
             goto out;
         }
+    }
+
+    //empty token "(num):/foo//bar" 
+    for(int i = 0; i < len-1; i++){
+        if(pathstr[i] == '/' && pathstr[i+1] == '/'){
+            return -EBADPATH;
+        }
+    }
+
+    //start is not in the format: (num):/
+    int read_digits = 0;
+    for(int i = 0; n_isdigit(pathstr[i]); i++){
+        read_digits++;
+    }
+    if(read_digits == 0 || pathstr[read_digits] != ':' || pathstr[read_digits+1] != '/'){
+        return -EBADPATH;
     }
 
 out:
@@ -55,7 +56,6 @@ void pparser_free(struct path_root *root){
  * Parse path string
  */
 struct path_root *pparser_parsePath(const char *pathstr){
-    //TODO: check for invalid returns
     if(pparser_ValidatePath < 0){ 
         return NULL;
     }
@@ -74,18 +74,15 @@ struct path_root *pparser_parsePath(const char *pathstr){
         read_chars++;
         pathstr_dup ++;
     }
-    if(read_chars == 0 || *(pathstr_dup) != ':' || *(pathstr_dup+1) != '/'){
-        //not in the format: (num):/
-        return NULL;
-    }
     root->drive_no = disk_no;
-    read_chars += 2;
-    pathstr_dup += 2;
+    read_chars += 1;
+    pathstr_dup += 1;
 
 
     //parse Tokens
     struct path_token *p = kzalloc(sizeof(struct path_token));
     struct path_token *first = p;
+
     while(read_chars < plen){
         p->next = kzalloc(sizeof(struct path_token));
         struct path_token *newToken = p->next;
@@ -93,7 +90,7 @@ struct path_root *pparser_parsePath(const char *pathstr){
         size_t token_len = (uint32_t)n_strchr(pathstr_dup, '/') - (uint32_t)pathstr_dup + 1;
         read_chars += token_len;
 
-        n_memcpy((void*) newToken->token, pathstr_dup, token_len);
+        n_memcpy((void*) newToken->token, pathstr_dup, token_len-1);
         pathstr_dup += token_len;
 
         p = newToken; 
@@ -101,7 +98,6 @@ struct path_root *pparser_parsePath(const char *pathstr){
 
     root->first = first->next; 
     kfree(first);
-
 
     kfree(pathstr_dup);
     return root;

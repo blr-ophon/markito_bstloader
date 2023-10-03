@@ -76,9 +76,6 @@ void kernel_main(void){
     //read from physical address to see if has been modified
     vgam3_print(ptr, MAIN_M3_COLOR);
 
-
-
-
-    struct path_root *path __attribute__((unused)) = pparser_parsePath("11:/foo/bar/");
+    struct path_root *path __attribute__((unused)) = pparser_parsePath("11:/foo/bar");
 }
 

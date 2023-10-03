@@ -23,3 +23,7 @@ int n_isalnum(int c){
 int n_isascii(int c){
     return ((unsigned) c <= 0x7f);
 }
+
+int n_iscntrl(int c){
+    return ((unsigned) c > 0x1f && (unsigned) c != 0x7f);
+}

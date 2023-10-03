@@ -7,6 +7,7 @@ int n_islower(int c);
 int n_isupper(int c);
 int n_isalnum(int c);
 int n_isascii(int c);
+int n_iscntrl(int c);
 
 
 #endif
