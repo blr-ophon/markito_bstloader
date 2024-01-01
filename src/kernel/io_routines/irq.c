@@ -11,7 +11,7 @@ void irq_init(void){
 }
 
 void IRQ_handler_noIRQ(void){
-    ior_outb(0x20, 0x20);
+    ior_outb(0x20, 0x20);   //Ackowledge
 }
 
 void IRQ_handler_21(void){
