@@ -7,6 +7,7 @@
 #include "memory/kheap.h"
 #include "paging/paging.h"
 #include "fs/pathparser.h"
+#include "disk/streamer.h"
 
 void screen_startup(void);
 

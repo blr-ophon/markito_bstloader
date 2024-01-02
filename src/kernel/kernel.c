@@ -77,5 +77,22 @@ void kernel_main(void){
     vgam3_print(ptr, MAIN_M3_COLOR);
 
     struct path_root *path __attribute__((unused)) = pparser_parsePath("11:/foo/bar.bin", NULL);
+
+
+    /*
+     * DISK/STREAMER test
+     */
+    struct disk_stream * dstream = diskstreamer_create(0);
+    if(!dstream){
+        vgam3_print("*** Error creating stream\n", MAIN_M3_COLOR);
+    }
+    uint8_t buf[2*SECTOR_SIZE] = {0};
+    diskstreamer_seek(dstream, 0x24);
+    int rv = diskstreamer_read(dstream, buf, 10);
+    if(rv < 0){
+        vgam3_print("*** Error reading from disk\n", MAIN_M3_COLOR);
+    }
+
+
 }
 
