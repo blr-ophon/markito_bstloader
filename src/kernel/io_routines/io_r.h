@@ -5,7 +5,7 @@
 
 uint8_t ior_inb(uint16_t port);
 
-uint8_t ior_inw(uint16_t port);
+uint16_t ior_inw(uint16_t port);
 
 void ior_outb(uint16_t port, uint8_t val);
 

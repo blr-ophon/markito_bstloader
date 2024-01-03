@@ -1,6 +1,7 @@
 #include "disk/disk.h"
 //TODO: sector hexdump
 //TODO: implement multiple disks
+#include "vgam3.h"
 
 
 int ata_read_lba(uint32_t lba, uint8_t n, void *buf);
