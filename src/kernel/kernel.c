@@ -87,8 +87,8 @@ void kernel_main(void){
         vgam3_print("*** Error creating stream\n", MAIN_M3_COLOR);
     }
     uint8_t buf[2*SECTOR_SIZE] = {0};
-    diskstreamer_seek(dstream, 0x24);
-    int rv = diskstreamer_read(dstream, buf, 10);
+    diskstreamer_seek(dstream, 0x00);
+    int rv = diskstreamer_read(dstream, buf, 513);
     if(rv < 0){
         vgam3_print("*** Error reading from disk\n", MAIN_M3_COLOR);
     }

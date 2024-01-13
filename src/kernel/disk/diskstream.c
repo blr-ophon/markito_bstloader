@@ -1,6 +1,5 @@
-#include "streamer.h"
+#include "diskstream.h"
 
-//TODO: Test.
 
 /*
  * Create new stream of a disk
