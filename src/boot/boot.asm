@@ -4,15 +4,45 @@ ORG 0x7c00
 CODE_SEG equ code_descriptor - gdt_start       
 DATA_SEG equ data_descriptor - gdt_start
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                          FAT16 BOOT SECTOR 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+jmp short _setup
+nop
+OEM_Id                  db 'CursedOS'
+
+;FAT16 Boot Sector. BPB (BIOS Parameter Block)
+Bytes_per_Sector        dw 0x200
+Sectors_per_Cluster     db 0x80
+Reserved_Sectors        dw 200
+FAT_Copies              db 0x02
+Root_Entries            dw 0x40
+Num_Sectors_Small       dw 0x00
+Media_Descriptor        db 0xf8
+Sectors_per_FAT         dw 0x100
+Sectors_per_Track       dw 0x20
+Number_of_Heads         dw 0x40
+Hidden_Sectors          dd 0x00
+Num_Sectors_Large       dd 0x773594
+
+;Extended BIOS Parameter Block (EBPB)
+Drive_Number            db 0x80
+Reserved_WinNT          db 0x00
+EBPB_Signature          db 0x29
+Volume_Serial_Number    dd 0xd105
+Volume_Label            db 'Cursed BOOT'
+File_System_type        db 'FAT16   '
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                           REAL-MODE CODE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_start:
-    jmp short _setup
-    nop
-    times 33 db 0           ;Clear BPB (BIOS Parameter Block)
-    jmp 0x00:_setup        ;cs <- 0x7c0
+
+    jmp 0x00:_setup         ;cs <- 0x7c0
 
 _setup:
     cli                     ;Clear interrupts 

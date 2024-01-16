@@ -36,8 +36,8 @@ ${OS_BIN}: ${BOOT_BIN} ${KERNEL_BIN}
 	rm -rf $@
 	dd if=${BOOT_BIN} >> ${OS_BIN}
 	dd if=${KERNEL_BIN} >> ${OS_BIN}
-	#100 sectors of 512 bytes of zeroes
-	dd if=/dev/zero bs=512 count=100 >> ${OS_BIN} 
+	#16MB bytes of zeroes (file data region)
+	dd if=/dev/zero bs=1048576 count=16 >> ${OS_BIN} 
 
 
 ####### Boot section #######
